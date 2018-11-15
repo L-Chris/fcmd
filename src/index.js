@@ -1,8 +1,8 @@
 const Option = require('./option');
 const Command = require('./command');
-const Handler = require('./handler');
+const Controller = require('./controller');
 
 exports.Option = Option;
 exports.Command = Command;
-exports.Handler = Handler;
-module.exports = new Handler();
+exports.Controller = Controller;
+module.exports = new Controller();
