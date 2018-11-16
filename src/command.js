@@ -1,5 +1,5 @@
 const Option = require('./option');
-const { noop } = require('./utils');
+const { isFunction } = require('./utils');
 
 class Command {
   constructor (controller, name, description, { isDefault = false } = {}) {
@@ -8,7 +8,7 @@ class Command {
     this.description = description;
     this.isDefault = isDefault;
     this.options = [];
-    this.handler = noop;
+    this.handlers = [];
   }
 
   alias (name) {
@@ -24,16 +24,17 @@ class Command {
   }
 
   action (fn) {
-    this.handler = fn;
+    if (!isFunction(fn)) throw new Error('should pass function to action method!');
+    this.handlers.push(fn);
     return this;
   }
 
   excute (argv, args) {
     for (const option of this.options) {
-      const { name, required } = option
+      const { name, required } = option;
       if (required && (!Reflect.has(args, name) || args[name] === undefined)) this.missingArgument(name);
     }
-    this.handler(argv, args)
+    this.handlers.forEach(h => h(argv, args));
   }
 
   findOption (arg) {
@@ -44,7 +45,7 @@ class Command {
     if (!this.options.length) return '';
 
     const info = this.options.reduce((pre, val) => {
-      pre += `${val.flags} ${val.description}\n`;
+      pre += `${val.flags.padEnd(this.controller.padWidth, ' ')}${val.description}\n`;
       return pre;
     }, '');
 
@@ -52,7 +53,7 @@ class Command {
   }
 
   missingArgument (name) {
-    console.error("error: missing required argument `%s'", name);
+    console.error('error: missing required argument %s', name);
     process.exit(1);
   }
 }

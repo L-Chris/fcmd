@@ -1,8 +1,8 @@
-const pkg = require('../package.json')
-const Option = require('./option')
-const Command = require('./command')
+const pkg = require('../package.json');
+const Option = require('./option');
+const Command = require('./command');
 
-const precommandName = 'pre'
+const precommandName = 'pre';
 
 class Controller {
   constructor () {
@@ -14,6 +14,7 @@ class Controller {
   init () {
     this.version(pkg.version);
 
+    // init precommand
     this.command(precommandName);
 
     this.option('-h --help [help]', 'get help info');
@@ -39,7 +40,7 @@ class Controller {
   }
 
   action (fn) {
-    this.precommand.handler = fn;
+    this.precommand.action(fn);
     return this;
   }
 
@@ -88,7 +89,7 @@ class Controller {
     if (!this.commands.length) return '';
 
     const info = this.commands.slice(1).reduce((pre, val) => {
-      pre += `${val.name} ${val.description}\n`;
+      pre += `${val.name.padEnd(this.padWidth, ' ')}${val.description}\n`;
       return pre;
     }, '');
 
@@ -98,6 +99,20 @@ class Controller {
   unknownCommand () {
     console.error('error: unknown command');
     process.exit(1);
+  }
+
+  get padWidth () {
+    const maxCommandLength = this.commands.reduce((pre, val) => {
+      pre = val.name.length > pre ? val.name.length : pre;
+      return pre;
+    }, 0)
+
+    const maxOptionLength = this.precommand.options.reduce((pre, val) => {
+      pre = val.flags.length > pre ? val.flags.length : pre;
+      return pre
+    }, 0)
+
+    return Math.max(maxCommandLength, maxOptionLength) + 5;
   }
 }
 
