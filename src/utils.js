@@ -14,10 +14,4 @@ exports.exists = file => {
 
 exports.noop = () => {};
 
-function isType (name) {
-  return function (obj) {
-    return toString.call(obj) === '[object ' + name + ']';
-  }
-}
-
-exports.isFunction = isType('Function');
+exports.isFunction = obj => typeof obj === 'function';

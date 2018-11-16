@@ -5,6 +5,9 @@ const fcmd = require('../src');
 fcmd
   .version('0.0.1')
   .description('test fcmd')
+  .action(async () => {
+    console.log('1');
+  });
 
 fcmd
   .command('dev', 'run a dev-server')

@@ -29,12 +29,15 @@ class Command {
     return this;
   }
 
-  excute (argv, args) {
+  async excute (argv, args) {
     for (const option of this.options) {
       const { name, required } = option;
       if (required && (!Reflect.has(args, name) || args[name] === undefined)) this.missingArgument(name);
     }
-    this.handlers.forEach(h => h(argv, args));
+
+    for (const handler of this.handlers) {
+      await handler(argv, args);
+    }
   }
 
   findOption (arg) {

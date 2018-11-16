@@ -61,9 +61,12 @@ class Controller {
     if (name.indexOf('-') < 0 && !command) return this.unknownCommand();
     const rawOptions = command ? argv.slice(3) : argv.slice(2);
     const parsedOptions = this.parseOptions(command, rawOptions);
+    this.excute(command, argv, parsedOptions);
+  }
 
-    this.precommand.excute(argv, parsedOptions);
-    command && command.excute(argv, parsedOptions);
+  async excute (command, argv, options) {
+    await this.precommand.excute(argv, options);
+    command && command.excute(argv, options);
   }
 
   parseOptions (command, rawOptions) {
