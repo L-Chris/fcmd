@@ -18,9 +18,6 @@ class Controller {
     this.command(precommandName);
 
     this.option('-h --help [help]', 'get help info');
-    this.action((argv, args) => {
-      if (Reflect.has(args, 'help')) return this.help();
-    });
   }
 
   get precommand () {
@@ -65,6 +62,7 @@ class Controller {
   }
 
   async excute (command, argv, options) {
+    if (Reflect.has(options, 'help')) return this.help();
     await this.precommand.excute(argv, options);
     command && command.excute(argv, options);
   }
