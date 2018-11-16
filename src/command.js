@@ -2,10 +2,11 @@ const Option = require('./option');
 const { noop } = require('./utils');
 
 class Command {
-  constructor (controller, name, description) {
+  constructor (controller, name, description, { isDefault = false } = {}) {
     this.controller = controller;
     this.name = name;
     this.description = description;
+    this.isDefault = isDefault;
     this.options = [];
     this.handler = noop;
   }
@@ -37,6 +38,17 @@ class Command {
 
   findOption (arg) {
     return this.options.find(_ => _.is(arg));
+  }
+
+  createOptionHelp () {
+    if (!this.options.length) return '';
+
+    const info = this.options.reduce((pre, val) => {
+      pre += `${val.flags} ${val.description}\n`;
+      return pre;
+    }, '');
+
+    return `Options:\n${info}`;
   }
 
   missingArgument (name) {

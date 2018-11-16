@@ -9,6 +9,6 @@
     "test": "node test/index.js"
   },
   "bin": {
-    "fcmd": "./test/fcmd"
+    "test": "./test/test"
   }
 }
