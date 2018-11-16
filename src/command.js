@@ -27,8 +27,21 @@ class Command {
     return this;
   }
 
+  excute (argv, args) {
+    for (const option of this.options) {
+      const { name, required } = option
+      if (required && (!Reflect.has(args, name) || args[name] === undefined)) this.missingArgument(name);
+    }
+    this.handler(argv, args)
+  }
+
   findOption (arg) {
     return this.options.find(_ => _.is(arg));
+  }
+
+  missingArgument (name) {
+    console.error("error: missing required argument `%s'", name);
+    process.exit(1);
   }
 }
 
