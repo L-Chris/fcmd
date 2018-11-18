@@ -1,5 +1,4 @@
 const pkg = require('../package.json');
-const Option = require('./option');
 const Command = require('./command');
 
 const precommandName = 'pre';
@@ -18,15 +17,15 @@ class Controller {
     this.command(precommandName);
 
     this.option('-h --help [help]', 'get help info');
+    this.option('-v --version [version]', 'get version');
   }
 
   get precommand () {
     return this.commands[0];
   }
 
-  option (name, description) {
-    const option = new Option(name, description);
-    this.precommand.options.push(option);
+  option (name, description, filter, defaultValue) {
+    this.precommand.option(name, description, filter, defaultValue)
     return this;
   }
 
@@ -63,6 +62,8 @@ class Controller {
 
   async excute (command, argv, options) {
     if (Reflect.has(options, 'help')) return this.help();
+    if (Reflect.has(options, 'version')) return this.showVersion();
+
     await this.precommand.excute(argv, options);
     command && command.excute(argv, options);
   }
@@ -72,12 +73,23 @@ class Controller {
     for (let i = 0; i < rawOptions.length; i += 2) {
       const arg = rawOptions[i];
       const value = rawOptions[i + 1];
+
       const precommandOption = this.precommand.findOption(arg);
+      if (precommandOption) {
+        args[precommandOption.name] = precommandOption.filter(value);
+      }
+
       const commandOption = command && command.findOption(arg);
-      precommandOption && (args[precommandOption.name] = value);
-      commandOption && (args[commandOption.name] = value);
+      if (commandOption) {
+        args[commandOption.name] = commandOption.filter(value);
+      }
     }
     return args;
+  }
+
+  showVersion () {
+    console.log(this._version);
+    process.exit();
   }
 
   help () {

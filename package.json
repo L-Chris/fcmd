@@ -1,6 +1,6 @@
 {
   "name": "fcmd",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "src/index.js",
   "repository": "https://github.com/L-Chris/fcmd",
   "author": "L-Chris <563303226@qq.com>",

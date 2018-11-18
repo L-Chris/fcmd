@@ -11,7 +11,13 @@ fcmd
 
 fcmd
   .command('dev', 'run a dev-server')
-  .option('-p --port <port>', 'server port')
-  .action((argv, options) => console.log('run dev', options.port));
+  .option('-p --port [port]', 'server port', parseInt, 8080)
+  .option('-h --hot [hot]', 'is server hot', true)
+  .option('-m --mode <mode>', 'server mode')
+  .action((argv, options) => {
+    console.log('run dev', options.port)
+    console.log('is hot', options.hot)
+    console.log('mode', options.mode)
+  });
 
 fcmd.parse(process.argv)

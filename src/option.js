@@ -1,5 +1,7 @@
+const { identity } = require('./utils')
+
 class Option {
-  constructor (flags, description = '') {
+  constructor (flags, description = '', filter = identity, defaultValue) {
     this.flags = flags;
     this.description = description;
     this.required = /<.+>/.test(flags);
@@ -10,6 +12,8 @@ class Option {
     };
     this.long = flags.shift();
     this.name = this.long.replace(/--/, '');
+    this.filter = filter;
+    this.defaultValue = defaultValue;
   }
 
   is (arg) {

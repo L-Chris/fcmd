@@ -1,5 +1,5 @@
 const Option = require('./option');
-const { isFunction } = require('./utils');
+const { isFunction, isRegExp, isDef } = require('./utils');
 
 class Command {
   constructor (controller, name, description, { isDefault = false } = {}) {
@@ -13,12 +13,30 @@ class Command {
 
   alias (name) {
     if (arguments.length === 0) return this._alias;
+    if (name === this.name) throw new Error('Command alias can\'t be the same as its name');
     this._alias = name;
     return this;
   }
 
-  option (name, description) {
-    const option = new Option(name, description);
+  option (name, description, filter, defaultValue) {
+    const option = new Option(name, description, filter, defaultValue);
+
+    if (!isFunction(filter)) {
+      if (isRegExp(filter)) {
+        const regex = filter;
+        filter = (val, def) => {
+          const m = regex.exec(val);
+          return m ? m[0] : def;
+        }
+      } else {
+        defaultValue = filter;
+        filter = undefined;
+      }
+    }
+
+    filter && (option.filter = filter);
+    option.defaultValue = defaultValue;
+
     this.options.push(option);
     return this;
   }
@@ -32,7 +50,9 @@ class Command {
   async excute (argv, args) {
     for (const option of this.options) {
       const { name, required } = option;
-      if (required && (!Reflect.has(args, name) || args[name] === undefined)) this.missingArgument(name);
+      if (Reflect.has(args, name) && isDef(args[name])) continue;
+      if (required) return this.missingArgument(name);
+      args[name] = option.defaultValue;
     }
 
     for (const handler of this.handlers) {
