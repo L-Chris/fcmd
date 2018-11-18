@@ -18,7 +18,7 @@ program
 
 program
   .command('test')
-  .option('-p --port', 'port option for test subcommand')
+  .option('-p --port', 'port option for test subcommand', parseInt, 8080)
   .action((argv, args) => {
     // do sth...
   });

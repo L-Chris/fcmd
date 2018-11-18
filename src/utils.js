@@ -14,4 +14,10 @@ exports.exists = file => {
 
 exports.noop = () => {};
 
+exports.identity = _ => _;
+
 exports.isFunction = obj => typeof obj === 'function';
+
+exports.isRegExp = obj => obj instanceof RegExp;
+
+exports.isDef = obj => obj !== undefined && obj !== null;
